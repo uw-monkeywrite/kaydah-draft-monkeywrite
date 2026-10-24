@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#34383d" />
+  <title>Monkey Write | Handwriting practice</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #eff2f0;
+      --muted: #c0c7c3;
+      --paper: #34383d;
+      --card: #42474d;
+      --line: #5a6065;
+      --green: #91c9a7;
+      --green-dark: #a0d4b3;
+      --sage: #505b56;
+      --orange: #efb578;
+      --orange-light: #5a4b3d;
+      --shadow: 0 18px 50px rgba(0, 0, 0, .18);
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: -.015em;
+    }
+    button, select { font: inherit; }
+    button { cursor: pointer; }
+    .shell { width: min(1080px, calc(100% - 48px)); margin: 0 auto; }
+    header { height: 84px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #50555b; }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 850; letter-spacing: -.055em; font-size: 21px; }
+    .brand-mark { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 11px; background: var(--green); color: #21382b; font-size: 17px; font-weight: 800; letter-spacing: 0; }
+    .brand em { color: #a5d5b7; font-style: normal; }
+    .top-right { display: flex; align-items: center; gap: 12px; }
+    .demo-pill { border: 1px solid #6b5b49; border-radius: 100px; padding: 7px 11px; color: #f0c18d; background: #4a443d; font-size: 10px; font-weight: 800; letter-spacing: .12em; }
+    .avatar { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #55575b; color: #eff0ed; font-size: 12px; font-weight: 800; }
+    main { padding: 36px 0 48px; }
+    .intro { display: flex; justify-content: space-between; align-items: end; margin-bottom: 22px; gap: 24px; }
+    .eyebrow { color: var(--green); font-size: 11px; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 8px 0 0; font-size: clamp(27px, 4vw, 38px); line-height: 1.08; letter-spacing: -.055em; }
+    .intro p { margin: 10px 0 0; color: var(--muted); font-size: 14px; }
+    .personalized { display: flex; align-items: center; gap: 9px; color: #d3dad5; font-size: 12px; padding: 10px 12px; border: 1px solid #5a6260; background: rgba(75,82,79,.55); border-radius: 12px; white-space: nowrap; }
+    .personalized svg { color: var(--green); }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
+    .card { border: 1px solid #596067; background: var(--card); border-radius: 19px; box-shadow: var(--shadow); }
+    .practice-card { padding: 23px; }
+    .prompt-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .prompt-controls { display: flex; align-items: center; gap: 10px; }
+    .label { display: flex; align-items: center; gap: 8px; color: #c5cec8; font-size: 11px; text-transform: uppercase; letter-spacing: .12em; font-weight: 800; }
+    .topic-select { appearance: none; border: 1px solid #626e67; background: #4c5650; color: #d1ead8; border-radius: 100px; padding: 7px 29px 7px 12px; font-size: 12px; font-weight: 750; outline: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b5dfc2' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+    .topic-select option { background: #42474d; color: #eff2f0; }
+    .part-progress { color: #c8d6cc; font-size: 10px; font-weight: 800; letter-spacing: .08em; white-space: nowrap; }
+    .prompt { margin: 17px 0 19px; padding: 19px 20px; background: #3a3f45; border: 1px solid #565d63; border-radius: 13px; font-size: clamp(20px, 2.5vw, 26px); line-height: 1.48; letter-spacing: -.025em; color: #f1f3f1; min-height: 94px; }
+    .writing-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: #c0c8c2; font-size: 12px; }
+    .timer { display: flex; align-items: center; gap: 7px; color: var(--ink); font-weight: 800; font-variant-numeric: tabular-nums; font-size: 13px; }
+    .timer-dot { width: 7px; height: 7px; border-radius: 50%; background: #88918b; }
+    .timer.running .timer-dot { background: #efad74; box-shadow: 0 0 0 4px #5a493c; }
+    .canvas-wrap { position: relative; height: 250px; border: 1px solid #747c78; border-radius: 13px; overflow: hidden; background-color: #e0e3df; background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 40px, #c3cbc5 41px, #c3cbc5 42px); background-position: 0 8px; }
+    canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: none; }
+    .canvas-empty { position: absolute; top: 14px; left: 16px; color: #66726a; font-family: Georgia, serif; font-style: italic; font-size: 14px; pointer-events: none; transition: opacity .2s; }
+    .canvas-wrap.has-ink .canvas-empty { opacity: 0; }
+    .actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 15px; }
+    .hint { font-size: 11px; color: #aeb8b1; }
+    .button-row { display: flex; gap: 8px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 10px; padding: 11px 15px; font-size: 12px; font-weight: 800; transition: transform .15s, background .15s; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--green); color: #20372a; box-shadow: 0 5px 12px rgba(0,0,0,.16); }
+    .btn-primary:hover { background: var(--green-dark); }
+    .btn-quiet { color: #e0e5e1; background: #555b61; }
+    .btn-outline { color: #bce2c8; background: #42474d; border: 1px solid #66716b; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    aside { display: grid; gap: 14px; }
+    .side-card { padding: 19px; }
+    .side-title { margin: 0; font-size: 13px; font-weight: 800; letter-spacing: -.02em; }
+    .side-desc { color: var(--muted); font-size: 12px; line-height: 1.55; margin: 7px 0 0; }
+    .round-row { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; padding-top: 14px; border-top: 1px solid #596067; }
+    .round-label { color: #bdc5bf; font-size: 11px; }
+    .round-value { font-size: 12px; font-weight: 800; }
+    .steps { display: grid; gap: 12px; margin-top: 16px; }
+    .step { display: flex; align-items: start; gap: 10px; color: #c0c7c2; font-size: 11px; line-height: 1.45; }
+    .step-num { display: grid; place-items: center; flex: 0 0 20px; height: 20px; border-radius: 7px; background: var(--sage); color: var(--green); font-size: 10px; font-weight: 850; }
+    .note { border: 1px solid #6b5b48; background: #48433c; color: #e2c8a7; border-radius: 13px; padding: 14px; font-size: 11px; line-height: 1.5; }
+    .note strong { display: block; color: #f0d3ae; font-size: 11px; margin-bottom: 4px; }
+    .result-view { display: none; }
+    .result-view.visible { display: block; }
+    .practice-view.hidden { display: none; }
+    .result-card { padding: 25px; }
+    .result-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+    .result-title { margin: 6px 0 0; font-size: 26px; letter-spacing: -.05em; }
+    .sim-tag { background: var(--orange-light); color: #f0c18d; border: 1px solid #806b52; border-radius: 100px; padding: 7px 10px; font-size: 10px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 21px 0; }
+    .stat { padding: 14px; border: 1px solid #596067; border-radius: 12px; background: #3d4248; }
+    .stat strong { display: block; font-size: 22px; letter-spacing: -.05em; }
+    .stat span { display: block; color: #bac3bd; margin-top: 4px; font-size: 10px; }
+    .result-prompt { color: #d1d8d3; line-height: 1.6; font-size: 15px; padding: 15px 16px; background: #3a3f45; border: 1px solid #555d62; border-radius: 11px; }
+    .word-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 17px 0 14px; }
+    .word { border-radius: 8px; padding: 6px 9px; font-size: 12px; font-weight: 700; }
+    .word.ok { color: #c7e6d0; background: #40584a; }
+    .word.review { color: #f2c798; background: #594938; outline: 1px dashed #bb8e60; }
+    .legend { display: flex; gap: 15px; color: #b9c2bc; font-size: 10px; }
+    .legend i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; background: #91c9a7; }
+    .legend .orange { background: #efb578; }
+    .result-foot { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #596067; }
+    .result-foot small { color: #b9c2bc; font-size: 10px; line-height: 1.4; max-width: 350px; }
+    footer { padding: 6px 0 25px; color: #aeb6b0; font-size: 10px; text-align: center; }
+    .toast { position: fixed; bottom: 22px; left: 50%; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; padding: 11px 15px; border-radius: 10px; background: #202328; color: white; font-size: 12px; box-shadow: var(--shadow); transition: .2s; }
+    .toast.show { opacity: 1; transform: translate(-50%,0); }
+    @media (max-width: 800px) {
+      .shell { width: min(100% - 28px, 620px); }
+      header { height: 68px; }
+      main { padding-top: 26px; }
+      .layout { grid-template-columns: 1fr; }
+      aside { grid-template-columns: 1fr 1fr; }
+      .note { grid-column: 1 / -1; }
+      .intro { align-items: flex-start; flex-direction: column; gap: 14px; }
+      .personalized { white-space: normal; }
+    }
+    @media (max-width: 520px) {
+      .practice-card, .result-card { padding: 16px; }
+      .demo-pill { display: none; }
+      .canvas-wrap { height: 230px; }
+      .actions { align-items: flex-start; flex-direction: column; }
+      .button-row { width: 100%; }
+      .button-row .btn { flex: 1; }
+      aside { grid-template-columns: 1fr; }
+      .note { grid-column: auto; }
+      .stat-grid { gap: 6px; }
+      .stat { padding: 11px 9px; }
+      .stat strong { font-size: 19px; }
+      .result-foot { align-items: flex-start; flex-direction: column-reverse; }
+    }
+  </style>
+</head>
+<body>
+  <header class="shell">
+    <div class="brand"><span class="brand-mark">m</span><span>monkey <em>write</em></span></div>
+    <div class="top-right"><span class="demo-pill">MEETING PROTOTYPE</span><span class="avatar" aria-label="Kaydah">K</span></div>
+  </header>
+
+  <main class="shell">
+    <div class="intro">
+      <div>
+        <div class="eyebrow">A little practice, a little progress</div>
+        <h1>Write it. Beat your best.</h1>
+        <p>A one-minute handwriting sprint, personalized for what you're learning.</p>
+      </div>
+      <div class="personalized">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg>
+        Prompt picked for your class
+      </div>
+    </div>
+
+    <div class="layout">
+      <section class="card practice-card">
+        <div class="practice-view" id="practiceView">
+          <div class="prompt-head">
+            <div class="label"><span aria-hidden="true">✳</span> Your practice prompt</div>
+            <div class="prompt-controls"><span class="part-progress" id="partProgress">PART 1 OF 2</span><select class="topic-select" id="topicSelect" aria-label="Choose a class topic">
+              <option value="biology">Biology</option>
+              <option value="computerScience">Computer science</option>
+              <option value="psychology">Psychology</option>
+            </select></div>
+          </div>
+          <div class="prompt" id="promptText">Mitochondria help cells make ATP</div>
+          <div class="writing-head">
+            <span>Write the sentence below</span>
+            <span class="timer" id="timer"><i class="timer-dot"></i><span id="timeDisplay">01:00</span></span>
+          </div>
+          <div class="canvas-wrap" id="canvasWrap">
+            <canvas id="writingCanvas" aria-label="Writing area. Click and drag with your mouse to write."></canvas>
+            <span class="canvas-empty" id="canvasEmpty">Your handwriting goes here…</span>
+          </div>
+          <div class="actions">
+            <span class="hint" id="inputHint">Use your mouse or trackpad to write</span>
+            <div class="button-row">
+              <button class="btn btn-quiet" id="clearButton" type="button" title="Clear writing">Clear</button>
+              <button class="btn btn-primary" id="startButton" type="button">Start 1-minute round <span aria-hidden="true">↗</span></button>
+              <button class="btn btn-outline" id="nextPartButton" type="button" hidden>Next part <span aria-hidden="true">→</span></button>
+              <button class="btn btn-primary" id="finishButton" type="button" hidden>Finish round</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-view" id="resultView">
+          <div class="result-card">
+            <div class="result-top">
+              <div><div class="eyebrow">Round complete</div><h2 class="result-title">Nice work. Here's your check-in.</h2></div>
+              <span class="sim-tag">Sample OCR result</span>
+            </div>
+            <div class="stat-grid">
+              <div class="stat"><strong>10 / 11</strong><span>words matched</span></div>
+              <div class="stat"><strong>91%</strong><span>prompt accuracy</span></div>
+              <div class="stat"><strong>01:00</strong><span>practice time</span></div>
+            </div>
+            <div class="result-prompt">Mitochondria help cells make ATP so they can power essential processes.</div>
+            <div class="word-list" aria-label="Sample word recognition results">
+              <span class="word ok">Mitochondria</span><span class="word ok">help</span><span class="word ok">cells</span><span class="word ok">make</span><span class="word ok">ATP</span><span class="word ok">so</span><span class="word ok">they</span><span class="word ok">can</span><span class="word review">power</span><span class="word ok">essential</span><span class="word ok">processes.</span>
+            </div>
+            <div class="legend"><span><i></i>Matched in sample</span><span><i class="orange"></i>Needs a closer look</span></div>
+            <div class="result-foot">
+              <small>This is example feedback only. The prototype doesn't read or grade your handwriting yet.</small>
+              <button class="btn btn-primary" id="againButton" type="button">Try another round <span aria-hidden="true">↗</span></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside>
+        <section class="card side-card">
+          <h2 class="side-title">Your round</h2>
+          <p class="side-desc">Copy each short part as it appears. Keep your pace comfortable and your letters clear.</p>
+          <div class="round-row"><span class="round-label">Round length</span><span class="round-value">01:00</span></div>
+          <div class="round-row" style="margin-top:0;padding-top:12px;border-top:0"><span class="round-label">Class topic</span><span class="round-value" id="topicLabel">Biology</span></div>
+        </section>
+        <section class="card side-card">
+          <h2 class="side-title">How it works</h2>
+          <div class="steps">
+            <div class="step"><span class="step-num">1</span><span>Choose a class and get a relevant sentence.</span></div>
+            <div class="step"><span class="step-num">2</span><span>Write each short part as it appears.</span></div>
+            <div class="step"><span class="step-num">3</span><span>Review words matched and words to check.</span></div>
+          </div>
+        </section>
+        <div class="note"><strong>Prototype note</strong>Word feedback is simulated for this demo. Mouse drawing is real; handwriting recognition is a future feature.</div>
+      </aside>
+    </div>
+  </main>
+  <footer class="shell">Concept prototype · Designed for a tablet and stylus, demo-ready with a mouse</footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const prompts = {
+      biology: { label: "Biology", parts: ["Mitochondria help cells make ATP", "so they can power essential processes."], words: ["Mitochondria", "help", "cells", "make", "ATP", "so", "they", "can", "power", "essential", "processes."], uncertain: 8 },
+      computerScience: { label: "Computer science", parts: ["A variable stores a value", "while a program is running."], words: ["A", "variable", "stores", "a", "value", "while", "a", "program", "is", "running."], uncertain: 1 },
+      psychology: { label: "Psychology", parts: ["Sleep helps strengthen memories", "formed during the day."], words: ["Sleep", "helps", "strengthen", "memories", "formed", "during", "the", "day."], uncertain: 3 }
+    };
+    const canvas = document.getElementById("writingCanvas");
+    const ctx = canvas.getContext("2d");
+    const wrap = document.getElementById("canvasWrap");
+    const timer = document.getElementById("timer");
+    const timeDisplay = document.getElementById("timeDisplay");
+    const startButton = document.getElementById("startButton");
+    const finishButton = document.getElementById("finishButton");
+    const nextPartButton = document.getElementById("nextPartButton");
+    const clearButton = document.getElementById("clearButton");
+    const topicSelect = document.getElementById("topicSelect");
+    const strokes = [];
+    let activeStroke = null;
+    let isRunning = false;
+    let remaining = 60;
+    let tick = null;
+    let currentPart = 0;
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const ratio = Math.max(1, window.devicePixelRatio || 1);
+      canvas.width = Math.round(rect.width * ratio);
+      canvas.height = Math.round(rect.height * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      redraw();
+    }
+    function redraw() {
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = "#26372f";
+      ctx.lineWidth = 3.2;
+      for (const stroke of strokes) {
+        if (stroke.length < 2) continue;
+        ctx.beginPath();
+        ctx.moveTo(stroke[0].x * rect.width, stroke[0].y * rect.height);
+        for (let i = 1; i < stroke.length; i++) ctx.lineTo(stroke[i].x * rect.width, stroke[i].y * rect.height);
+        ctx.stroke();
+      }
+    }
+    function pointFromEvent(event) {
+      const rect = canvas.getBoundingClientRect();
+      return { x: (event.clientX - rect.left) / rect.width, y: (event.clientY - rect.top) / rect.height };
+    }
+    canvas.addEventListener("pointerdown", event => {
+      if (!isRunning) {
+        showToast("Start the round first, then write here.");
+        return;
+      }
+      event.preventDefault();
+      canvas.setPointerCapture(event.pointerId);
+      activeStroke = [pointFromEvent(event)];
+      strokes.push(activeStroke);
+      wrap.classList.add("has-ink");
+    });
+    canvas.addEventListener("pointermove", event => {
+      if (!activeStroke) return;
+      event.preventDefault();
+      activeStroke.push(pointFromEvent(event));
+      redraw();
+    });
+    function endStroke() { activeStroke = null; }
+    canvas.addEventListener("pointerup", endStroke);
+    canvas.addEventListener("pointercancel", endStroke);
+    window.addEventListener("resize", resizeCanvas);
+    requestAnimationFrame(resizeCanvas);
+
+    function formatTime(seconds) { return `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`; }
+    function setRoundState(running) {
+      isRunning = running;
+      startButton.hidden = running;
+      finishButton.hidden = !running;
+      clearButton.disabled = running;
+      topicSelect.disabled = running;
+      nextPartButton.hidden = !running || currentPart >= prompts[topicSelect.value].parts.length - 1;
+      timer.classList.toggle("running", running);
+      document.getElementById("inputHint").textContent = running ? "Click and drag to write" : "Use your mouse or trackpad to write";
+    }
+    function updatePrompt() {
+      const selected = prompts[topicSelect.value];
+      currentPart = Math.min(currentPart, selected.parts.length - 1);
+      document.getElementById("promptText").textContent = selected.parts[currentPart];
+      document.getElementById("partProgress").textContent = `PART ${currentPart + 1} OF ${selected.parts.length}`;
+      nextPartButton.hidden = !isRunning || currentPart >= selected.parts.length - 1;
+    }
+    function clearCanvas() {
+      strokes.length = 0;
+      activeStroke = null;
+      redraw();
+      wrap.classList.remove("has-ink");
+    }
+    function startRound() {
+      clearInterval(tick);
+      clearCanvas();
+      remaining = 60;
+      currentPart = 0;
+      updatePrompt();
+      timeDisplay.textContent = "01:00";
+      setRoundState(true);
+      tick = setInterval(() => {
+        remaining -= 1;
+        timeDisplay.textContent = formatTime(remaining);
+        if (remaining <= 0) finishRound();
+      }, 1000);
+    }
+    function finishRound() {
+      clearInterval(tick);
+      tick = null;
+      setRoundState(false);
+      renderSampleResults();
+      document.getElementById("practiceView").classList.add("hidden");
+      document.getElementById("resultView").classList.add("visible");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    function renderSampleResults() {
+      const selected = prompts[topicSelect.value];
+      const matchedCount = selected.words.length - 1;
+      const accuracy = Math.round(matchedCount / selected.words.length * 100);
+      document.querySelector(".result-prompt").textContent = selected.words.join(" ");
+      document.querySelector(".stat-grid").innerHTML = `<div class="stat"><strong>${matchedCount} / ${selected.words.length}</strong><span>words matched</span></div><div class="stat"><strong>${accuracy}%</strong><span>prompt accuracy</span></div><div class="stat"><strong>01:00</strong><span>practice time</span></div>`;
+      document.querySelector(".word-list").innerHTML = selected.words.map((word, index) => `<span class="word ${index === selected.uncertain ? "review" : "ok"}">${word}</span>`).join("");
+    }
+    function goAgain() {
+      document.getElementById("resultView").classList.remove("visible");
+      document.getElementById("practiceView").classList.remove("hidden");
+      timeDisplay.textContent = "01:00";
+      clearCanvas();
+      currentPart = 0;
+      updatePrompt();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+    startButton.addEventListener("click", startRound);
+    finishButton.addEventListener("click", finishRound);
+    nextPartButton.addEventListener("click", () => {
+      currentPart += 1;
+      updatePrompt();
+    });
+    clearButton.addEventListener("click", clearCanvas);
+    document.getElementById("againButton").addEventListener("click", goAgain);
+    topicSelect.addEventListener("change", () => {
+      const choice = prompts[topicSelect.value];
+      document.getElementById("topicLabel").textContent = choice.label;
+      currentPart = 0;
+      updatePrompt();
+    });
+  </script>
+</body>
+</html>
